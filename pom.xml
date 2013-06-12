@@ -7,7 +7,7 @@
 
     <properties>
         <junit.version>4.5</junit.version>
-        <hadoop.version>2.0.0-cdh4.1.2</hadoop.version>
+        <hadoop.version>1.0.2</hadoop.version>
         <maven.compile.source>1.6</maven.compile.source>
         <maven.compile.target>1.6</maven.compile.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,8 +17,8 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>2.0.0-cdh4.1.2</version>
+            <artifactId>hadoop-core</artifactId>
+            <version>${hadoop.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -26,6 +26,17 @@
             <artifactId>junit</artifactId>
             <version>4.5</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.4.3</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
