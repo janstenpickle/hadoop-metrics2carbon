@@ -73,7 +73,7 @@ public class CarbonSink implements MetricsSink {
             logger.info("AMQP Connection to "+addr+" established");
 
         } catch (IOException io) {
-            throw new MetricsException("Failed to putMetrics", io);
+            throw new MetricsException("Failed to start sink", io);
         }
 
     }
@@ -82,9 +82,19 @@ public class CarbonSink implements MetricsSink {
     @Override
     public void putMetrics(MetricsRecord record) {
 
-        //This is horrible, but we need EPOCH time to be 10 digits
-        long timestamp = Long.parseLong(String.valueOf(record.timestamp()).substring(0, 10));
+        //We only need EPOCH time to be 10 digits
+        long timestamp = record.timestamp() / 1000;
 
+        Collection<MetricsTag> tags = (Collection<MetricsTag>) record.tags();
+
+        String prefix = this.prefix;
+
+        for (MetricsTag t : tags) {
+            logger.debug("Tag "+t.name()+" desc " + t.description() + " value "+t.value());
+            if (t.name().equals("context")) {
+                prefix = prefix + "." + t.value();
+            }
+        }
 
         Collection<Metric> metrics = (Collection<Metric>) record.metrics();
         if (metrics.size() > 0) {
