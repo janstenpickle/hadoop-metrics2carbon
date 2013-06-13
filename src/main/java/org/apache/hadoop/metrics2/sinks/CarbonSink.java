@@ -103,7 +103,7 @@ public class CarbonSink implements MetricsSink {
                 // we got metrics. so send the latest
                 for (Metric metric : record.metrics()) {
 
-                    double value = metric.value().doubleValue();
+                    float value = metric.value().floatValue();
                     value = Math.round(value * 1000) / 1000;
 
                     message.append(prefix + '.' + metric.name() + ' ' + value + ' ' + timestamp + "\n");
