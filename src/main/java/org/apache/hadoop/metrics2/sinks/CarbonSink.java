@@ -32,6 +32,8 @@ public class CarbonSink implements MetricsSink {
     private static final String ROUTING_KEY = "amqp.routing.key";
     private static final String VHOST_KEY = "amqp.vhost";
     private static final String PREFIX_KEY = "prefix";
+    private static final String ZEROS_AS_NULL_KEY = "zeros.as.null";
+
 
 
     private ConnectionFactory factory = new ConnectionFactory();
@@ -40,6 +42,7 @@ public class CarbonSink implements MetricsSink {
     private String routingKey;
     private String exchangeName;
     private String prefix;
+    private Boolean zerosAsNull;
     // a key with a NULL value means ALL
     private Map<String, Set<String>> useTagsMap = new HashMap<String, Set<String>>();
 
@@ -55,6 +58,7 @@ public class CarbonSink implements MetricsSink {
             routingKey = conf.getString(ROUTING_KEY, "#");
             String vhost = conf.getString(VHOST_KEY, "/");
             prefix = conf.getString(PREFIX_KEY, "hadoop");
+            zerosAsNull = conf.getBoolean(ZEROS_AS_NULL_KEY, true);
 
             factory.setHost(addr);
             factory.setPort(port);
@@ -104,11 +108,15 @@ public class CarbonSink implements MetricsSink {
                 for (Metric metric : record.metrics()) {
 
                     float value = metric.value().floatValue();
-                    value = Math.round(value * 1000) / 1000;
+                    //do not send the value if it is zero and config is set to do so
+                    if (value != 0 && zerosAsNull) {
+                        value = Math.round(value * 1000) / 1000;
 
-                    message.append(prefix + '.' + metric.name() + ' ' + value + ' ' + timestamp + "\n");
+                        message.append(prefix + '.' + metric.name() + ' ' + value + ' ' + timestamp + "\n");
 
-                    logger.debug("Metric " + prefix + metric.name() + " value: " + value);
+                        logger.debug("Metric " + prefix + metric.name() + " value: " + value);
+
+                    }
 
                 }
                 logger.debug("Publishing metric " + message);
